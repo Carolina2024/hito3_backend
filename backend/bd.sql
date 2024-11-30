@@ -1,17 +1,17 @@
-CREATE DATABASE marketback;
+CREATE DATABASE market;
 
-\c marketback;
+\c market;
 
 CREATE TABLE usuarios (
     id SERIAL PRIMARY KEY,
-    nombre VARCHAR(50) NOT NULL,
-    password VARCHAR(50) NOT NULL,
-    email VARCHAR(50) UNIQUE NOT NULL
+    nombre VARCHAR(100) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL
 );
 
 CREATE TABLE publicaciones (
     id SERIAL PRIMARY KEY,
-    titulo VARCHAR(50) NOT NULL,
+    titulo VARCHAR(255) NOT NULL,
     descripcion TEXT NOT NULL,
     imagen_url VARCHAR(255),
     precio NUMERIC(10, 2) NOT NULL,
@@ -35,6 +35,10 @@ CREATE TABLE items_boleta (
     publicacion_id INT NOT NULL REFERENCES publicaciones(id) ON DELETE CASCADE,
     cantidad_item INT NOT NULL CHECK (cantidad_item > 0)
 );
+
+
+
+
 
 
 //SELECT * FROM usuarios;
