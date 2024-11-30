@@ -1,29 +1,40 @@
 // las funciones HITO 3
 const pool = require("../config/config");
-const bcrypt = require("bcryptjs");/// se agrega para encriptado de contraseñas
+const bcrypt = require("bcryptjs"); /// se agrega para encriptado de contraseñas
 const jwt = require("jsonwebtoken");
+const { findByEmail, createUser } = require("../models/userModel");
 
 //conectar formulario de frontend a la API de backend
 // registrar usuario en la base de datos
-const registrarUsuario = async (usuario) => {
-  let { nombre, password, email } = usuario;
-  // Encriptar la contraseña
+const registrarUsuario = async (req, res) => {
+  const { nombre, password, email } = req.body;
   const passwordEncriptada = bcrypt.hashSync(password); // para encriptar las contraseñas
-  password = passwordEncriptada;
-  const values = [nombre, passwordEncriptada, email];
-  const consulta =
-    "INSERT INTO usuarios (nombre,password, email) VALUES ($1, $2, $3)";  // se inserta los datos en la tabla usuarios
-  await pool.query(consulta, values);
+  try {
+    await createUser({
+      nombre,
+      passwordEncriptada, 
+      email,
+    });
+    return res.status(201).json({ message: "Usuario creado correctamente" });
+  } catch (error) {
+    console.log(error);
+
+    if (error.code === "23505") {
+      return res.status(400).json({ message: "Usuario ya existe" });
+    }
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 // para verificar credenciales, se valida el email y contraseña
 const verificarCredenciales = async (email, password) => {
-  const values = [email];
-  const consulta = "SELECT * FROM usuarios WHERE email = $1";
+  //const values = [email
+  //const consulta = "SELECT * FROM usuarios WHERE email = $1";
   const {
     rows: [usuario],
     rowCount,
-  } = await pool.query(consulta, values);
+  } = await findByEmail(email);
+  //} = await pool.query(consulta, values);
   const { password: passwordEncriptada } = usuario;
   const passwordEsCorrecta = bcrypt.compareSync(password, passwordEncriptada); // compara la constraseña encriptada con bcrypt para autenticacion
   if (!passwordEsCorrecta || !rowCount)
@@ -42,6 +53,3 @@ const getUsuarios = async (email) => {
 };
 
 module.exports = { registrarUsuario, verificarCredenciales, getUsuarios };
-
-
-

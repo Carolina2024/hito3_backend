@@ -41,6 +41,7 @@ CREATE TABLE items_boleta (
 
 
 
+
 //SELECT * FROM usuarios;
 //SELECT * FROM publicaciones;
 //SELECT * FROM favoritos;
